@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@types/archiver": "^7.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "archiver": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
     "minio": "^8.0.6",
     "nuxt": "^4.2.1",
     "vue": "^3.5.24",
