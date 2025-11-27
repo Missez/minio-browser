@@ -22,3 +22,9 @@ logs
 .env
 .env.*
 !.env.example
+
+# Private keys
+secret
+secret.pub.pem
+
+/app/generated/prisma

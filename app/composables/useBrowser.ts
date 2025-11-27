@@ -46,6 +46,17 @@ export const useBrowser = () => {
         } catch (err: any) { alert(err.data?.message || 'Error') }
     }
 
+    const deleteBucket = async (bucketName: string) => {
+        if (!confirm(`Delete bucket "${bucketName}"? This action cannot be undone.`)) return
+        try {
+            await $fetch('/api/buckets.delete', { method: 'POST', body: { bucketName } })
+            if (currentBucket.value === bucketName) {
+                currentBucket.value = '' // Reset current bucket if deleted
+            }
+            refreshBuckets()
+        } catch (err: any) { alert(err.data?.statusMessage || 'Failed to delete bucket') }
+    }
+
     const deleteFile = async (filename: string) => {
         if (!confirm(`Delete ${filename}?`)) return
         try {
@@ -60,7 +71,7 @@ export const useBrowser = () => {
                 method: 'POST',
                 body: { filename, bucket: currentBucket.value }
             }) as { url: string }
-            
+
             await navigator.clipboard.writeText(url)
 
             // Visual feedback
@@ -135,9 +146,9 @@ export const useBrowser = () => {
         try {
             await $fetch('/api/delete', {
                 method: 'POST',
-                body: { 
-                    filenames: Array.from(selectedFiles.value), 
-                    bucketName: currentBucket.value 
+                body: {
+                    filenames: Array.from(selectedFiles.value),
+                    bucketName: currentBucket.value
                 }
             })
             selectedFiles.value.clear()
@@ -160,6 +171,7 @@ export const useBrowser = () => {
         selectBucket,
         navigateTo,
         createBucket,
+        deleteBucket,
         deleteFile,
         shareFile,
         downloadFile,

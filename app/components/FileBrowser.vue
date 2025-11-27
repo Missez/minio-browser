@@ -17,11 +17,12 @@
              
              <div class="bulk-actions" v-if="selectedFiles.size > 0">
                 <button @click="downloadSelectedZip" class="btn btn-download">📦 Zip</button>
-                <button @click="deleteSelected" class="btn btn-del">🗑 Delete</button>
+                <button v-if="isAdmin" @click="deleteSelected" class="btn btn-del">🗑 Delete</button>
              </div>
         </div>
         
         <div 
+          v-if="isAdmin"
           class="drop-zone" 
           :class="{ 'is-dragging': isDragging }"
           @dragover.prevent="isDragging = true"
@@ -64,9 +65,9 @@
              <div class="file-meta" v-if="file.isFile">{{ (file.size / 1024).toFixed(2) }} KB</div>
              <div class="actions" v-if="file.isFile">
                 <a :href="file.url" target="_blank" class="btn btn-view" title="View">👁</a>
-                <button @click="shareFile(file.name, $event)" class="btn btn-share" title="Share">🔗</button>
+                <button v-if="isAdmin" @click="shareFile(file.name, $event)" class="btn btn-share" title="Share">🔗</button>
                 <button @click="downloadFile(file.url, file.name)" class="btn btn-download" title="Download">⬇</button>
-                <button @click="deleteFile(file.name)" class="btn btn-del" title="Delete">🗑</button>
+                <button v-if="isAdmin" @click="deleteFile(file.name)" class="btn btn-del" title="Delete">🗑</button>
              </div>
              <div class="actions" v-else>
                 <button @click="navigateTo(currentPath + file.name)" class="btn btn-view">Open</button>
@@ -99,6 +100,7 @@ const {
     deleteSelected
 } = useBrowser()
 
+const { isAdmin } = useAuth()
 const isDragging = ref(false)
 const fileInputRef = ref(null)
 

@@ -24,13 +24,14 @@ const router = useRouter()
 
 const handleLogin = async () => {
   try {
-    const { token } = await $fetch('/api/auth/login', {
+    await $fetch('/api/auth/login', {
       method: 'POST',
       body: { username: username.value, password: password.value }
     })
     
-    const authCookie = useCookie('auth_token')
-    authCookie.value = token
+    // Cookie is set by the server
+    // We can verify it exists if needed, but router.push should work now
+    // if httpOnly is false.
     
     router.push('/')
   } catch (error) {
