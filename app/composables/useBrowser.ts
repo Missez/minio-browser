@@ -49,7 +49,7 @@ export const useBrowser = () => {
     const deleteBucket = async (bucketName: string) => {
         if (!confirm(`Delete bucket "${bucketName}"? This action cannot be undone.`)) return
         try {
-            await $fetch('/api/buckets.delete', { method: 'POST', body: { bucketName } })
+            await $fetch('/api/buckets', { method: 'DELETE', body: { bucketName } })
             if (currentBucket.value === bucketName) {
                 currentBucket.value = '' // Reset current bucket if deleted
             }
