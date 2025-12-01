@@ -2,6 +2,11 @@
     <aside class="sidebar">
       <h3>🪣 MinIO Browser</h3>
       
+      <nav class="main-nav">
+        <NuxtLink to="/" class="nav-item" active-class="active">🏠 Files</NuxtLink>
+        <NuxtLink to="/search" class="nav-item" active-class="active">🔍 Search</NuxtLink>
+      </nav>
+      
       <div v-if="isAdmin" class="input-group">
         <input v-model="newBucketName" placeholder="New bucket..." @keyup.enter="createBucket" />
         <button @click="createBucket" class="btn-icon">+</button>
@@ -32,13 +37,20 @@ const {
     createBucket, 
     pendingBuckets, 
     buckets, 
-    selectBucket, 
+    selectBucket: baseSelectBucket, 
     currentBucket,
     deleteBucket 
 } = useBrowser()
 
 const { isAdmin } = useAuth()
 const router = useRouter()
+
+const selectBucket = (name) => {
+  baseSelectBucket(name)
+  if (router.currentRoute.value.path !== '/') {
+    router.push('/')
+  }
+}
 
 const handleLogout = () => {
   const authCookie = useCookie('auth_token')
@@ -63,4 +75,10 @@ const handleLogout = () => {
 .logout-section { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
 .btn-logout { width: 100%; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
 .btn-logout:hover { background: #c0392b; }
+
+.main-nav { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+.nav-item { color: #bdc3c7; text-decoration: none; padding: 10px; border-radius: 4px; transition: 0.2s; }
+.nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-item.active { background: #42b883; color: white; font-weight: bold; }
+
 </style>

@@ -11,5 +11,6 @@ export default defineNuxtConfig({
     minioSecretKey: process.env.MINIO_SECRET_KEY,
     minioBucket: process.env.MINIO_BUCKET,
     jwtSecret: process.env.JWT_SECRET || 'default-secret-change-me',
+    elasticsearchEndpoint: process.env.ELASTICSEARCH_ENDPOINT,
   }
 })

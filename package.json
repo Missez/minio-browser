@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^8.19.1",
     "@types/archiver": "^7.0.0",
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.3",

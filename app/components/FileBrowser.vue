@@ -157,18 +157,27 @@ const processUpload = async (fileList) => {
     for (let i = 0; i < total; i += BATCH_SIZE) {
         const batch = fileList.slice(i, i + BATCH_SIZE)
         await Promise.all(batch.map(async (file) => {
-            const formData = new FormData()
             const relativePath = file.fullPath || file.name
             const fullPath = currentPath.value + relativePath
             
-            formData.append('file', file, fullPath) 
-
             try {
-                await $fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                    query: { bucket: currentBucket.value }
+                // 1. Get Presigned URL
+                const { url } = await $fetch('/api/presigned', {
+                    query: { 
+                        bucket: currentBucket.value,
+                        filename: fullPath
+                    }
                 })
+
+                // 2. Upload directly to MinIO
+                await fetch(url, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type || 'application/octet-stream'
+                    }
+                })
+
             } catch (err) { console.error(`Failed ${file.name}`, err) } 
             finally {
                 count++
