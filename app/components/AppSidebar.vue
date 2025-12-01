@@ -26,6 +26,7 @@
         </li>
       </ul>
       <div class="logout-section">
+        <button @click="handleSwitchAccount" class="btn-switch">🔄 Switch Account</button>
         <button @click="handleLogout" class="btn-logout">🚪 Logout</button>
       </div>
     </aside>
@@ -42,8 +43,13 @@ const {
     deleteBucket 
 } = useBrowser()
 
-const { isAdmin } = useAuth()
+const { signOut, data } = useAuth()
 const router = useRouter()
+
+// Derive isAdmin from session data. 
+// Note: You may need to configure the session callback in server/api/auth/[...].ts 
+// to include the role from Keycloak.
+const isAdmin = computed(() => (data.value?.user)?.role === 'admin')
 
 const selectBucket = (name) => {
   baseSelectBucket(name)
@@ -52,10 +58,30 @@ const selectBucket = (name) => {
   }
 }
 
-const handleLogout = () => {
-  const authCookie = useCookie('auth_token')
-  authCookie.value = null
-  router.push('/login')
+const handleLogout = async () => {
+  await signOut({ callbackUrl: '/login' })
+}
+
+const handleSwitchAccount = async () => {
+  // Get id_token from session BEFORE signing out
+  const idToken = data.value?.id_token
+
+  // 1. Clear local session
+  await signOut({ redirect: false })
+  
+  // 2. Redirect to Keycloak Logout
+  const config = useRuntimeConfig()
+  const issuer = config.public.keycloakIssuer
+  const redirectUri = encodeURIComponent(window.location.origin + '/login')
+  
+  // Construct Keycloak Logout URL with id_token_hint
+  let logoutUrl = `${issuer}/protocol/openid-connect/logout?post_logout_redirect_uri=${redirectUri}`
+  
+  if (idToken) {
+    logoutUrl += `&id_token_hint=${idToken}`
+  }
+  
+  window.location.href = logoutUrl
 }
 </script>
 
@@ -72,9 +98,11 @@ const handleLogout = () => {
 .bucket-list li:hover .btn-delete-bucket { opacity: 1; }
 .btn-delete-bucket:hover { transform: scale(1.2); }
 
-.logout-section { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+.logout-section { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
 .btn-logout { width: 100%; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
 .btn-logout:hover { background: #c0392b; }
+.btn-switch { width: 100%; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+.btn-switch:hover { background: #d35400; }
 
 .main-nav { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
 .nav-item { color: #bdc3c7; text-decoration: none; padding: 10px; border-radius: 4px; transition: 0.2s; }

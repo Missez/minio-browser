@@ -100,7 +100,9 @@ const {
     deleteSelected
 } = useBrowser()
 
-const { isAdmin } = useAuth()
+const { data } = useAuth()
+const isAdmin = computed(() => data.value?.user?.role === 'admin')
+
 const isDragging = ref(false)
 const fileInputRef = ref(null)
 
